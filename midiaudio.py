@@ -1,5 +1,6 @@
 from midi2audio import FluidSynth
 import mido
+import moteaf as mt
 
 def read_midi_file(filename):
     mid = mido.MidiFile(filename)
@@ -35,19 +36,21 @@ def read_midi_file(filename):
 
 
 ''' SECION 2 '''
-read_midi_file('test1.mid')
-print()
-read_midi_file('test.mid')
+fs = FluidSynth(sound_font='Nice-Steinway-Lite-v3.0.sf2')
 
 def change_track_bmp(filename, bpm):
     mid = mido.MidiFile(filename)
+    tempo = mido.bpm2tempo(bpm) 
+    
     for i, track in enumerate(mid.tracks):
+        found = False
         for msg in track:
             if msg.type == 'set_tempo':
-                msg.tempo = mido.bpm2tempo(bpm) 
+                msg.tempo = tempo
+                found = True
+        if found == False:
+            track.insert(0, mido.MetaMessage('set_tempo', tempo=tempo))
     return mid
-
-fs = FluidSynth(sound_font='Nice-Steinway-Lite-v3.0.sf2')
 
 def play_midi_file(filename):
     fs.play_midi(filename)
@@ -66,4 +69,24 @@ def play_track_with_bpm(midi_filename, bpm, transpose = 0):
     mid.save(temp_filename)
     play_midi_file(temp_filename)
 
-play_track_with_bpm("test.mid", 60, transpose=1)
+def play_motif(motif_string: str, bpm: float = 120, transpose: int = 0):
+    temp_name = 'temp_motif.mid'
+    motif_tree = mt.motif_parse(motif_string)
+    midi = mt.motif_2_midi(motif_tree)
+    mt.save_midi(midi, temp_name)
+
+    play_track_with_bpm(temp_name, bpm, transpose)
+
+# motif ="""
+#     Am9[0 1 2 3 4 :: 4]-(3/2), 
+#     Bm7[3 4 5 6 :: 3]-(3/2), 
+#     Cmaj9[0 1 2 3 4 :: 5]-(2), 
+#     Em7<[3 5]-(3/4), [6]-(1/4), [7 9]-(1/4), [8]-(1/4), [6]-(1/4) :: 4>, 
+#     Em7<[3]-(1/4), [2]-(1/4), [3]-(1/4), [4]-(1/4), [1]-(1/4) :: 4>
+#     """
+# play_motif(motif, bpm=140)
+# read_midi_file('temp.mid')
+# print()
+# # read_midi_file('temp_mof.mid')
+# play_track_with_bpm('temp.mid', 60)
+# read_midi_file('temp.mid')

@@ -1,0 +1,3 @@
+[submodule "moteaf-lang"]
+	path = moteaf-lang
+	url = https://github.com/getrod/moteaf-lang.git
