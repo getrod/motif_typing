@@ -1,22 +1,9 @@
 import flet as ft
-# from multiprocessing import Process
 from midiaudio import play_motif
 import random
+import json
+from moteaf import motif_2_midi, motif_parse
 
-
-
-dictionary = {
-    'the': """C chrom< [0]-(1/4),[1]-(1/4),[2]-(1/4),[3]-(1/4),[4]-(1/4),[5]-(1/4),[6]-(1/4),[7]-(1/4),[8]-(1/4),[9]-(1/4),[10]-(1/4),[11]-(1/4), [12]-(3/4) :: 5>""",
-    'i':  """A maj< [0]-(1/4),[1]-(1/4),[2]-(1/4),[3]-(1/4),[4]-(1/4),[5]-(1/4),[6]-(1/4) :: 5>""",
-    'hi': """Bb m9< [0]-(1/4),[1]-(1/4),[2]-(1/4),[3]-(1/4),[4]-(1/4),[5]-(1/4),[6]-(1/4) :: 5>"""
-}
-
-# def run_as_process(func, args: tuple):
-#     process = Process(target=func, args=args)
-#     process.start()
-#     return process 
-
-# audio_process: Process = None
 
 def main(page: ft.Page):
     page.theme_mode = ft.ThemeMode.LIGHT
@@ -27,7 +14,12 @@ def main(page: ft.Page):
 
     bpm = 120
 
-    def dict_entry(word: str, motif: str):
+    # get words
+    json_f = open('dictionary.json')
+    dictionary = json.loads(json_f.read())
+    json_f.close()
+
+    def dict_entry(word: str, motif: str, bpm: int = bpm):
         word = ft.Text(value=word, text_align=ft.TextAlign.CENTER, width=100)
 
         def play(e):
@@ -85,20 +77,24 @@ def main(page: ft.Page):
     text_bpm = ft.TextField(value=f'{bpm}', text_align='center', width=100, on_change=on_change)
 
     bpm_edit = ft.Row(
-            [
-                ft.Text(value='bpm', text_align=ft.TextAlign.CENTER, width=100),
-                text_bpm,
-            ],
-            alignment=ft.MainAxisAlignment.CENTER,
-        )
+        [
+            ft.Text(value='bpm', text_align=ft.TextAlign.CENTER, width=100),
+            text_bpm,
+        ],
+        alignment=ft.MainAxisAlignment.CENTER,
+    )
+
+    # create dictionary entries
+    entries = []
+    for entry in dictionary[1:]:
+        entries.append(dict_entry(entry[0], entry[1], int(entry[2])))
 
     page.add(
         ft.Column(
-            [
-                dict_entry('the', dictionary['the']),
+            entries + [
+                # dict_entry(dictionary[0], dictionary[1]),
                 # dict_entry('yup', []),
                 bpm_edit
-
             ],
             alignment=ft.MainAxisAlignment.CENTER,
         )
