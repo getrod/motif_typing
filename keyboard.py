@@ -76,7 +76,7 @@ def make_intervals(_notes):
     intervals = []
     if len(_notes) > 1:
         for i in range(len(_notes) - 1):
-            interval = _notes[i] - _notes[i + 1]
+            interval = _notes[i + 1] - _notes[i] 
             intervals.append(interval)
     return intervals
 
@@ -101,8 +101,8 @@ def midi_callback(event, data=None):
     and message[2] != 0:
         midi_event = 'note_on'
         
-        notes.insert(0, message[1])
-        if len(notes) >= MAX_NOTES: notes.pop()
+        notes.append(message[1])
+        if len(notes) >= MAX_NOTES: notes.pop(0)
 
         intervals = make_intervals(notes)
         word = find_word(intervals)
@@ -110,6 +110,7 @@ def midi_callback(event, data=None):
             # reset the intervals
             notes.clear()
             pyautogui.write(f'{word} ', interval=0)
+        print(intervals)
         print(word)
     else:
         midi_event = 'note_off'

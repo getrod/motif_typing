@@ -19,7 +19,7 @@ def main(page: ft.Page):
     dictionary = json.loads(json_f.read())
     json_f.close()
 
-    def dict_entry(word: str, motif: str, bpm: int = bpm):
+    def dict_entry(word: str, motif: str):
         word = ft.Text(value=word, text_align=ft.TextAlign.CENTER, width=100)
 
         def play(e):
@@ -87,7 +87,7 @@ def main(page: ft.Page):
     # create dictionary entries
     entries = []
     for entry in dictionary[1:]:
-        entries.append(dict_entry(entry[0], entry[1], int(entry[2])))
+        entries.append(dict_entry(entry[0], entry[1]))
 
     page.add(
         ft.Column(
